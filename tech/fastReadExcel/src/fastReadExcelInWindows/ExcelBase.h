@@ -1,4 +1,4 @@
-#ifndef EXCELREADER_H
+﻿#ifndef EXCELREADER_H
 #define EXCELREADER_H
 #include <QObject>
 #include <QAxObject>
@@ -64,7 +64,10 @@ public:
 
     /// @brief 设置并指定当前 Sheet.
     /// @param [in] 当前 Sheet 索引，从 1 开始
-    bool setCurrentSheet(int index);
+    bool setCurrentSheet(int index, QString sheetName);
+
+    ///@brief 设置列宽
+    void setColumnWidth(int col,int width);
 
     /// @brief 当前打开的 Excel 的 Sheet 名
     QString currentSheetName();

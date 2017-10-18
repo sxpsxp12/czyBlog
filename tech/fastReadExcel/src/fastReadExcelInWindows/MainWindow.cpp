@@ -64,7 +64,7 @@ void MainWindow::on_action_write_triggered()
         }
         m_datas.append(rows);
     }
-    m_xls->setCurrentSheet(1);
+    m_xls->setCurrentSheet(1,"测试");
     timer.restart();
     m_xls->writeCurrentSheet(m_datas);
     qDebug()<<"write cost:"<<timer.elapsed()<<"ms";timer.restart();

@@ -1,4 +1,4 @@
-#include "ExcelBase.h"
+﻿#include "ExcelBase.h"
 #include <QFile>
 
 #include <QList>
@@ -71,6 +71,7 @@ void ExcelBasePrivate::construct()
     excel = new QAxObject(q_ptr);
     excel->setControl("Excel.Application");
     excel->setProperty("Visible",false);
+    excel->setProperty("DisplayAlerts", false); //不显示任何警告框
     if (excel->isNull())
     {
         excel->setControl("ET.Application");
@@ -305,7 +306,7 @@ bool ExcelBase::currentSheet()
     return ret;
 }
 
-bool ExcelBase::setCurrentSheet(int index)
+bool ExcelBase::setCurrentSheet(int index,QString sheetName)
 {
     bool ret = false;
 #if defined(Q_OS_WIN)
@@ -318,6 +319,7 @@ bool ExcelBase::setCurrentSheet(int index)
         if(ret)
         {
             d->sheet->dynamicCall("Activate(void)");
+            d->sheet->setProperty("Name",sheetName);
         }
         d->sheetName = ret ? d->sheet->property("Name").toString() : "";
     }
@@ -325,6 +327,31 @@ bool ExcelBase::setCurrentSheet(int index)
     Q_UNUSED(index)
 #endif // Q_OS_WIN
     return ret;
+}
+
+//设置列宽
+void ExcelBase::setColumnWidth(int col, int width)
+{
+#if defined(Q_OS_WIN)
+    Q_D(ExcelBase);
+    if(d->sheet != NULL && !d->sheet->isNull())
+    {
+        //根据列号获取列名
+        QString columnName;
+        convertToColName(col,columnName);
+        QAxObject *col_object = d->sheet->querySubObject("Columns(const QString&)", columnName);
+        if(col_object == NULL || col_object->isNull())
+        {
+            qDebug() << "获取列失败:" << columnName;
+            return;
+        }
+        col_object->setProperty("ColumnWidth",width);
+        delete col_object;
+    }
+#else
+    Q_UNUSED(col)
+    Q_UNUSED(width)
+#endif
 }
 
 int ExcelBase::sheetCount()
